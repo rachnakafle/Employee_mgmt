@@ -33,7 +33,14 @@ namespace EmployeeManagement
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseStaticFiles();
+            FileServerOptions fileServerOptions = new FileServerOptions();
+
+            fileServerOptions.DefaultFilesOptions.DefaultFileNames.Clear();
+            fileServerOptions.DefaultFilesOptions.DefaultFileNames.Add("foo.html");
+            app.UseFileServer(fileServerOptions);
+            //app.UseDefaultFiles(defaultFilesOptions);
+            //app.UseStaticFiles();
+           
 
             //app.UseRouting();
 
