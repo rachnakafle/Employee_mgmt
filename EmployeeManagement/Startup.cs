@@ -14,8 +14,9 @@ namespace EmployeeManagement
     public class Startup
     {
         private IConfiguration _config;
+        
 
-        public Startup (IConfiguration config)
+        public Startup(IConfiguration config)
         {
             _config = config;
         }
@@ -23,56 +24,37 @@ namespace EmployeeManagement
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddMvc().AddSessionStateTempDataProvider();
+            services.AddSession(); ;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public async void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+
+        public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            FileServerOptions fileServerOptions = new FileServerOptions();
-
-            fileServerOptions.DefaultFilesOptions.DefaultFileNames.Clear();
-            fileServerOptions.DefaultFilesOptions.DefaultFileNames.Add("foo.html");
-            app.UseFileServer(fileServerOptions);
-            //app.UseDefaultFiles(defaultFilesOptions);
-            //app.UseStaticFiles();
-           
-
-            //app.UseRouting();
-
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapGet("/", async context =>
-            //    {
-            //        await context.Response.WriteAsync(_config["MyKey"]);
-            //    });
-            //});
-
-            //app.Use(async (context, next) =>
-            //    {
-            //        logger.LogInformation("MW1:incoming request");
-            //        //await context.Response.WriteAsync("Hello from first middle ware!");
-            //        await next();
-            //        logger.LogInformation("MW1:outgoing request");
-            //    });
-
-            //app.Use(async (context, next) =>
-            //{
-            //    logger.LogInformation("MW2:incoming request");
-            //    //await context.Response.WriteAsync("Hello from first middle ware!");
-            //    await next();
-            //    logger.LogInformation("MW2:outgoing request");
-            //});
-
-            app.Run(async (context) =>
+            else
             {
-                await context.Response.WriteAsync("Hello World");
-                //logger.LogInformation("MW3:Request Handled and response produced.");
-            });
-        }
+                app.UseExceptionHandler("/Home/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseSession();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+            });         
+        }       
     }
 }
+
